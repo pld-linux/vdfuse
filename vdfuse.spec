@@ -12,8 +12,9 @@ Source0:	VirtualBox-%{virtualbox_version}-include-only.tar.bz2
 # Source0-md5:	2444d8604cc628ff2b2fa17adf0d3e58
 Source1:	%{name}-v82a.c
 # Source1-md5:	0450afd90bf7157a4a3057431f635108
-BuildRequires:	libfuse-devel
 BuildRequires:	VirtualBox
+BuildRequires:	libfuse-devel
+BuildRequires:	pkgconfig
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
