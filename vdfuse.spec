@@ -1,17 +1,20 @@
 # TODO
 # - split VirtualBox spec to -libs and -devel so this package could be built
-%define		virtualbox_version 4.1.8
+%define		virtualbox_version 5.1.18
 Summary:	A FUSE module for mounting VirtualBox disk images (VDI/VMDK/VHD) on the host
 Name:		vdfuse
-Version:	8.2a
+Version:	0.83
 Release:	1
+Epoch:		2
 License:	GPL v3
 Group:		Base/Kernel
 URL:		http://forums.virtualbox.org/viewtopic.php?f=7&t=17574
 Source0:	VirtualBox-%{virtualbox_version}-include-only.tar.bz2
-# Source0-md5:	2444d8604cc628ff2b2fa17adf0d3e58
-Source1:	%{name}-v82a.c
-# Source1-md5:	0450afd90bf7157a4a3057431f635108
+# Source0-md5:	a47cca26712ba293567f55c6b0a9683b
+Source1:	%{name}-%{version}.c
+# Source1-md5:	9185cc68b7b5227694e295d814b77d36
+# https://bugs.launchpad.net/ubuntu/+source/virtualbox-ose/+bug/759988
+Patch0:		%{name}-ebr.patch
 BuildRequires:	VirtualBox
 BuildRequires:	libfuse-devel
 BuildRequires:	pkgconfig
@@ -27,18 +30,20 @@ readonly and the partitions themselves can only be mounted readonly.
 NB: you will need to add "user_allow_other" to /etc/fuse.conf
 
 %prep
-%setup -q -n VirtualBox-%{virtualbox_version}_OSE
+%setup -q -n VirtualBox-%{virtualbox_version}
+%{__cp} %{SOURCE1} .
+%patch0 -p0
 
 %build
 export LD_LIBRARY_PATH=%{_libdir}/VirtualBox
 FUSE_CFLAGS=$(pkg-config --cflags --libs fuse)
-%{__cc} %{SOURCE1} -o %{name} \
+%{__cc} %{name}-%{version}.c -o %{name} \
 	$FUSE_CFLAGS \
 	-I./include \
 	-Wl,-rpath,%{_libdir}/VirtualBox \
-	-l:%{_libdir}/VirtualBox/VBoxDD.so \
-	-l:%{_libdir}/VirtualBox/VBoxDD2.so \
-	-l:%{_libdir}/VirtualBox/VBoxDDU.so \
+	%{_libdir}/VirtualBox/VBoxDD.so \
+	%{_libdir}/VirtualBox/VBoxDD2.so \
+	%{_libdir}/VirtualBox/VBoxDDU.so \
 	-Wall %{rpmcflags}
 
 %install

@@ -1,0 +1,20 @@
+--- vdfuse-0.83.c.orig	2017-03-28 13:02:17.156773628 +0200
++++ vdfuse-0.83.c	2017-03-28 13:29:07.636623796 +0200
+@@ -491,7 +491,7 @@
+ 			lastPartition++;
+ 			Partition *p = partitionTable + i;
+ 
+-			DISKread (uStart + uOffset + EBR_START, &ebr, sizeof (ebr));
++			DISKread (uStart + uOffset, &ebr, sizeof (ebr));
+ 
+ 			if (ebr.signature != 0xaa55)
+ 				usageAndExit ("Invalid EBR signature found on image");
+@@ -512,7 +512,7 @@
+ 				break;
+ 			if (!PARTTYPE_IS_EXTENDED (ebr.chain.type))
+ 				usageAndExit ("Logical partition chain broken");
+-			uOffset = (ebr.chain).offset;
++			uOffset = (off_t)((ebr.chain).offset) * BLOCKSIZE;
+ 		}
+ 	}
+ //
